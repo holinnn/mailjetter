@@ -15,10 +15,15 @@ module Mailjetter
 
     def response
       @response ||= begin
-        res = Net::HTTP.new(request_url.host, request_url.port).start {|http| http.request(request)}
+        http = Net::HTTP.new(request_url.host, request_url.port)
+        http.use_ssl = Mailjetter.config.use_https
+        res = http.request(request)
+        
         case res
           when Net::HTTPSuccess
             JSON.parse(res.body)
+          else
+            raise ApiError.new(res.code)
         end
       end
     end
@@ -27,6 +32,7 @@ module Mailjetter
     def request
       req = "Net::HTTP::#{@request_type}".constantize.new(request_url.path)
       req.basic_auth Mailjetter.config.api_key, Mailjetter.config.secret_key
+      req
     end
 
     def request_url

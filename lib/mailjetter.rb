@@ -3,6 +3,7 @@
 module Mailjetter
   autoload :Configuration, 'configuration'
   autoload :ApiRequest, 'api_request'
+  autoload :ApiError, 'api_error'
   
   # configiration shortcuts
   def self.configure
