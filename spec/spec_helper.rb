@@ -8,5 +8,12 @@ require 'mailjetter'
 Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
 RSpec.configure do |config|
-  
+  config.before(:each) do
+    load "#{File.dirname(__FILE__)}/support/configuration.rb"
+  end
+
+  config.after(:each) do
+    Object.send(:remove_const, 'Mailjetter')
+    Dir["#{File.dirname(__FILE__)}/../lib/**/*.rb"].each {|f| load f}
+  end
 end

@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "mailjetter"
   gem.homepage = "http://github.com/holinnn/mailjetter"
   gem.license = "MIT"
-  gem.summary = %Q{Mailjet ruby library}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{A Mailjet ruby library}
+  gem.description = %Q{}
   gem.email = "aurelien.amilin@gmail.com"
   gem.authors = ["Holinnn"]
   # dependencies defined in Gemfile

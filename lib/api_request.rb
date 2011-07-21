@@ -2,26 +2,30 @@
 
 require 'active_support/core_ext/string/inflections'
 require 'net/http'
-require 'uri'
 require 'json'
+require 'cgi'
 
 module Mailjetter
   class ApiRequest
-    def initialize(method_name, params = {}, request_type = 'Get')
-      @method_name = method_name.camelize(:lower)
-      @params = params.merge(:output => 'json')
-      @request_type = request_type.camelize
+    MAILJET_HOST = 'api.mailjet.com'
+
+    def initialize(method_name, params = {}, request_type = nil, auth_user = Mailjetter.config.api_key, auth_password = Mailjetter.config.secret_key)
+      @method_name = method_name.to_s.camelize(:lower)
+      @params = (params || {}).merge(:output => 'json')
+      @request_type = (request_type || 'Get').camelize
+      @auth_user = auth_user
+      @auth_password = auth_password
     end
 
     def response
       @response ||= begin
-        http = Net::HTTP.new(request_url.host, request_url.port)
+        http = Net::HTTP.new(MAILJET_HOST, request_port)
         http.use_ssl = Mailjetter.config.use_https
         res = http.request(request)
         
         case res
           when Net::HTTPSuccess
-            JSON.parse(res.body)
+            JSON.parse(res.body || '{}')
           else
             raise ApiError.new(res.code)
         end
@@ -30,19 +34,27 @@ module Mailjetter
 
     private
     def request
-      req = "Net::HTTP::#{@request_type}".constantize.new(request_url.path)
-      req.basic_auth Mailjetter.config.api_key, Mailjetter.config.secret_key
-      req
+      @request ||= begin
+        req = "Net::HTTP::#{@request_type}".constantize.new(request_path)
+        Net::HTTP::Get
+        req.basic_auth @auth_user, @auth_password
+        req.set_form_data(@params)
+        req
+      end
     end
 
-    def request_url
-      @request_url ||= begin
-        url = Mailjetter.config.use_https ? 'https' : 'http'
-        url << "://api.mailjet.com/#{Mailjetter.config.api_version}"
-        url <<  "/#{@method_name}"
-
-        URI.parse(url)
+    def request_path
+      @request_path ||= begin
+        path = "/#{Mailjetter.config.api_version}/#{@method_name}"
+        if @request_type == 'Get'
+          path <<  '?' + @params.collect { |k,v| "#{k}=#{CGI::escape(v.to_s)}" }.join('&')
+        end
+        path
       end
+    end
+
+    def request_port
+      Mailjetter.config.use_https ? 443 : 80
     end
   end
 end
