@@ -21,6 +21,8 @@ Add mailjetter in your Gemfile
   api = Mailjetter::Api.new
   api.user_infos
   => {"infos"=>{"username"=>"", "firstname"=>"", "lastname"=>"", "company_name"=>"", "locale"=>"fr_FR", "contact_phone"=>nil}}
+  api.lists_contacts(:id => 639)
+  => {"status"=>"OK", "total_cnt"=>"1", "result"=>[{"id"=>"8225160", "last_activity"=>"0", "sent"=>"0", "email"=>"user@host.com"}]}
 
 Or (if not configured)
 
