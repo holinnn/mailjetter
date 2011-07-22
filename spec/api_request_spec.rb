@@ -54,4 +54,21 @@ describe Mailjetter::ApiRequest do
       response['infos']['username'].should be_a(String)
     end
   end
+
+  describe "#guess_request_type" do
+    it "should return 'Post' if method_name contains a special verb" do
+      Mailjetter::ApiRequest.new('lists_add_contact').send(:guess_request_type).should == 'Post'
+      Mailjetter::ApiRequest.new('lists_create').send(:guess_request_type).should == 'Post'
+      Mailjetter::ApiRequest.new('lists_delete').send(:guess_request_type).should == 'Post'
+      Mailjetter::ApiRequest.new('lists_remove_contact').send(:guess_request_type).should == 'Post'
+      Mailjetter::ApiRequest.new('lists_update').send(:guess_request_type).should == 'Post'
+    end
+
+    it "should return 'Get' if method_name does not contain a verb" do
+      Mailjetter::ApiRequest.new('key_list').send(:guess_request_type).should == 'Get'
+      Mailjetter::ApiRequest.new('contact_list').send(:guess_request_type).should == 'Get'
+      Mailjetter::ApiRequest.new('lists_all').send(:guess_request_type).should == 'Get'
+      Mailjetter::ApiRequest.new('lists_email').send(:guess_request_type).should == 'Get'
+    end
+  end
 end

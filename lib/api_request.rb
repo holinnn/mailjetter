@@ -12,7 +12,7 @@ module Mailjetter
     def initialize(method_name, params = {}, request_type = nil, auth_user = Mailjetter.config.api_key, auth_password = Mailjetter.config.secret_key)
       @method_name = method_name.to_s.camelize(:lower)
       @params = (params || {}).merge(:output => 'json')
-      @request_type = (request_type || 'Get').camelize
+      @request_type = (request_type || guess_request_type).camelize
       @auth_user = auth_user
       @auth_password = auth_password
     end
@@ -55,6 +55,14 @@ module Mailjetter
 
     def request_port
       Mailjetter.config.use_https ? 443 : 80
+    end
+
+    def guess_request_type
+      if @method_name =~ /(?:Create|Add|Remove|Delete|Update)(?:[A-Z]|$)/
+        'Post'
+      else
+        'Get'
+      end
     end
   end
 end
