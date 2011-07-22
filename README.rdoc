@@ -30,6 +30,9 @@ Or (if not configured)
   api.user_infos
   => {"infos"=>{"username"=>"", "firstname"=>"", "lastname"=>"", "company_name"=>"", "locale"=>"fr_FR", "contact_phone"=>nil}}
 
+It tries to guess the HTTP method to use based on the name of the method you call, if you want to force the request type just add it after the parameters :
+
+  api.lists_contacts({:id => 639}, 'Get')
 
 == Copyright
 
