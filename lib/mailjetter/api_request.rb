@@ -21,6 +21,7 @@ module Mailjetter
       @response ||= begin
         http = Net::HTTP.new(MAILJET_HOST, request_port)
         http.use_ssl = Mailjetter.config.use_https
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE  if http.use_ssl
         res = http.request(request)
         
         case res
